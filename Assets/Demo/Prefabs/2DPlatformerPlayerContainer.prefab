@@ -426,6 +426,7 @@ MonoBehaviour:
     type: 3}
   _isBeamSpawned: 0
   activeBeam: {fileID: 0}
+  lightbeamRide: {fileID: 0}
 --- !u!114 &8346764429609804861
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -438,11 +439,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: aef34d7df77c5ba49993b44f49d17830, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  movement: {fileID: 0}
   rideSpeed: 10
-  rideMask:
-    serializedVersion: 2
-    m_Bits: 0
+  isRiding: 0
+  onStopRidingBeam:
+    m_PersistentCalls:
+      m_Calls: []
 --- !u!114 &4001811317445761059
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -458,7 +459,6 @@ MonoBehaviour:
   <CursorMode>k__BackingField: 2
   <LookInCameraDirection>k__BackingField: 1
   <Movement>k__BackingField: {fileID: 8700276836711986089}
-  fireBeam: {fileID: 5792752877997576760}
   _beamSpawnTransform: {fileID: 5444583764973058618}
 --- !u!1 &7765261338290157645
 GameObject:

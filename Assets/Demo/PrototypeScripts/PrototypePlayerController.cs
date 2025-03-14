@@ -4,10 +4,16 @@ using UnityEngine.InputSystem;
 
 public class PrototypePlayerController : PlayerController
 {
-    [SerializeField] private LightbeamSpawn fireBeam;
-    [SerializeField] private LightbeamRide lightbeamRide;
+    private LightbeamSpawn fireBeam;
+    private LightbeamRide lightbeamRide;
     [SerializeField] protected Transform _beamSpawnTransform;
+    private CharacterMovement2D movement;
 
+
+    private void Start()
+    {
+        _beamSpawnTransform = GetComponent<Transform>();
+    }
     public override void OnFire(InputValue value)
     {
         Vector2 firePosition = _beamSpawnTransform.transform.position;
@@ -21,5 +27,12 @@ public class PrototypePlayerController : PlayerController
         fireBeam.SpawnBeam(firePosition, fireDirection);
 
 
+    }
+    public override void OnJump(InputValue value)
+    {
+        if(lightbeamRide.isRiding == true && movement.CanMove == false)
+        {
+            lightbeamRide.JumpOffBeam();
+        }
     }
 }

@@ -6,12 +6,11 @@ using UnityEngine.Events;
 
 public class LightbeamRide : MonoBehaviour
 {
-    public CharacterMovement2D movement;
+    private CharacterMovement2D movement;
     [SerializeField] public float rideSpeed = 10f;
-    [SerializeField] private bool isRiding = false;
+    [SerializeField] public bool isRiding = false;
     private Vector2 travelDirection;
     private Rigidbody2D rb;
-    [SerializeField] private LayerMask rideMask;
 
     public UnityEvent onStopRidingBeam;
 
@@ -32,7 +31,8 @@ public class LightbeamRide : MonoBehaviour
         
         isRiding = true;
         travelDirection = (end - start).normalized;
-        movement.CanMove = true;
+        movement.CanMove = false;
+        
         StartCoroutine(RideCoroutine(start, end));
     }
 
@@ -55,12 +55,12 @@ public class LightbeamRide : MonoBehaviour
     }
 
     //TODO BELOW
-    private void JumpOffBeam()
+    public void JumpOffBeam()
     {
         if (!isRiding) return;
         isRiding = false;
-
         movement.CanMove = true;
+        movement.Jump();
         rb.linearVelocity = travelDirection * rb.linearVelocity.magnitude;
     }
 
