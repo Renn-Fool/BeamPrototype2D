@@ -13,8 +13,10 @@ public class LightbeamController : MonoBehaviour
     [SerializeField] private string targetLayerName = "Character";
     [SerializeField] private float maxBeamLength = 500f;
 
-    [SerializeField] private Vector2 beamStart;
-    [SerializeField] private Vector2 beamEnd;
+    private Vector2 beamStart;
+    private Vector2 beamPlayerRideStart;
+    private Vector2 playerPositionOnTrigger;
+    private Vector2 beamEnd;
     private LightbeamRide beamRide;
     private bool beamActive;
 
@@ -24,42 +26,61 @@ public class LightbeamController : MonoBehaviour
         lineRenderer = GetComponent<LineRenderer>();
         edgeCollider = GetComponent<EdgeCollider2D>();
         edgeCollider.isTrigger = true;
+        //SetEdgeCollider(lineRenderer);
     }
 
     private void Update()
     {
         SetEdgeCollider(lineRenderer);
+
+
+        //failsafe for the triggerenter being dumb
+        if (beamRide == null) // Only check if the beam ride hasn't started
+        {
+            Collider2D hit = Physics2D.OverlapPoint(transform.position, LayerMask.GetMask(targetLayerName));
+            if (hit != null)
+            {
+                OnTriggerEnter2D(hit);
+            }
+        }
     }
-    private void SetEdgeCollider(LineRenderer lineRenderer)
+
+    public void SetEdgeCollider(LineRenderer lineRenderer)
     {
         List<Vector2> edges = new List<Vector2>();
 
-        for (int point = 0; point<lineRenderer.positionCount; point++)
+        for (int point = 0; point < lineRenderer.positionCount; point++)
         {
             Vector3 lineRendererPoint = lineRenderer.GetPosition(point);
-            edges.Add(new Vector2(lineRendererPoint.x, lineRendererPoint.y));   
+            edges.Add(new Vector2(lineRendererPoint.x, lineRendererPoint.y));
         }
         edgeCollider.SetPoints(edges);
     }
 
     private void OnTriggerEnter2D(Collider2D collision)
     {
-        Debug.Log("Player entered the beam. Starting ride.");
+
         int layer = collision.gameObject.layer;
+        playerPositionOnTrigger = collision.transform.position;
+
         if (layer == LayerMask.NameToLayer(targetLayerName))
         {
-            Debug.Log("Player entered the beam. Starting ride.");
+
             beamRide = collision.GetComponent<LightbeamRide>();
-            if(beamRide != null)
+            beamPlayerRideStart = edgeCollider.ClosestPoint(playerPositionOnTrigger);
+
+            if (beamRide != null)
             {
-                beamRide.RideBeam(beamStart, beamEnd);
+                
+                beamRide.RideBeam(beamPlayerRideStart, beamEnd);
                 Debug.Log("Player entered the beam. Starting ride.");
             }
         }
     }
+
     public void FireBeam(Vector2 start, Vector2 direction)
     {
-       
+
         beamStart = start;
         Debug.DrawLine(start, direction * 100);
         RaycastHit2D hit = Physics2D.Raycast(beamStart, direction.normalized, maxBeamLength, collisionMask);
@@ -97,4 +118,34 @@ public class LightbeamController : MonoBehaviour
     {
         return beamEnd;
     }
+
+    //copy pasted from above setedgecollider
+    private void OnDrawGizmos()
+    {
+        if (edgeCollider == null || lineRenderer == null) return;
+
+
+        Gizmos.color = Color.red;
+
+
+        List<Vector2> points = new List<Vector2>();
+        for (int i = 0; i < lineRenderer.positionCount; i++)
+        {
+            Vector3 lineRendererPoint = lineRenderer.GetPosition(i);
+            points.Add(new Vector2(lineRendererPoint.x, lineRendererPoint.y));
+        }
+
+
+        for (int i = 0; i < points.Count - 1; i++)
+        {
+            Gizmos.DrawLine(points[i], points[i + 1]);
+        }
+    }
+
 }
+ 
+//TODO LIST
+//beam spawn position offset forward a little in the direction of the mouse
+//make sure player only starts moving when directly on beam
+//make em reflectable
+//

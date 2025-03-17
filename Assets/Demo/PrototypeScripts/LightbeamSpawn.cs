@@ -9,13 +9,27 @@ public class LightbeamSpawn : MonoBehaviour
 
     [SerializeField] private LightbeamController activeBeam;
     [SerializeField] private LightbeamRide lightbeamRide;
+    private bool isListenerSet = false;
 
+
+    private void Start()
+    {
+        lightbeamRide = GetComponent<LightbeamRide>();
+    }
+    
     private void Update()
     {
-        if (lightbeamRide != null)
+        if (lightbeamRide != null && lightbeamRide.isRiding == true && isListenerSet == false)
         {
             // Register the listener for the event from LightbeamRide
             lightbeamRide.onStopRidingBeam.AddListener(ReturnBeam);
+            isListenerSet = true;
+        }
+        if (lightbeamRide != null && lightbeamRide.isRiding == false && isListenerSet == true)
+        {
+            // Register the listener for the event from LightbeamRide
+            lightbeamRide.onStopRidingBeam.RemoveListener(ReturnBeam);
+            isListenerSet = false;
         }
     }
     public void SpawnBeam(Vector2 start, Vector2 direction)
@@ -23,7 +37,7 @@ public class LightbeamSpawn : MonoBehaviour
         //start = _beamSpawnTransform.transform.position;
         if (activeBeam != null && _isBeamSpawned == true)
         {
-            Debug.Log("Beam Retracted");
+
             ReturnBeam();
             return;
             
@@ -38,14 +52,8 @@ public class LightbeamSpawn : MonoBehaviour
     public void ReturnBeam()
     {
         _isBeamSpawned = false;
+        Debug.Log("Beam Retracted");
         Destroy(activeBeam.gameObject);
     }
-    private void OnDestroy()
-    {
-        if (lightbeamRide != null)
-        {
-            // Unregister the listener to avoid memory leaks
-            lightbeamRide.onStopRidingBeam.RemoveListener(ReturnBeam);
-        }
-    }
+    
 }

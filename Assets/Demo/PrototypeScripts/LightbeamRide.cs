@@ -57,7 +57,8 @@ public class LightbeamRide : MonoBehaviour
     //TODO BELOW
     public void JumpOffBeam()
     {
-        if (!isRiding) return;
+        if (isRiding == false) return;
+        StopRiding();
         isRiding = false;
         movement.CanMove = true;
         movement.Jump();

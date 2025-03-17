@@ -7,16 +7,24 @@ public class PrototypePlayerController : PlayerController
     private LightbeamSpawn fireBeam;
     private LightbeamRide lightbeamRide;
     [SerializeField] protected Transform _beamSpawnTransform;
-    private CharacterMovement2D movement;
 
 
     private void Start()
     {
-        _beamSpawnTransform = GetComponent<Transform>();
+        if (_beamSpawnTransform == null) // Prevents overwriting
+        {
+            _beamSpawnTransform = transform.Find("BeamBuddy");
+        }
+
+            fireBeam = GetComponent<LightbeamSpawn>();
+        lightbeamRide = GetComponent<LightbeamRide>();
+
     }
+
     public override void OnFire(InputValue value)
     {
-        Vector2 firePosition = _beamSpawnTransform.transform.position;
+        Vector2 firePosition = _beamSpawnTransform.position;
+        Debug.Log($"Beam Spawn Transform: {_beamSpawnTransform.name}");
         Vector2 mousePosition = Camera.main.ScreenToWorldPoint(Input.mousePosition);
         Vector2 fireDirection = (mousePosition - firePosition).normalized;
 
@@ -30,9 +38,12 @@ public class PrototypePlayerController : PlayerController
     }
     public override void OnJump(InputValue value)
     {
-        if(lightbeamRide.isRiding == true && movement.CanMove == false)
+        if (Movement != null)
         {
-            lightbeamRide.JumpOffBeam();
+            if (lightbeamRide.isRiding == true && Movement.CanMove == false)
+            {
+                lightbeamRide.JumpOffBeam();
+            }
         }
     }
 }

@@ -52,12 +52,8 @@ MonoBehaviour:
   collisionMask:
     serializedVersion: 2
     m_Bits: 1
-  playerMask:
-    serializedVersion: 2
-    m_Bits: 256
+  targetLayerName: Character
   maxBeamLength: 500
-  beamStart: {x: 0, y: 0}
-  beamEnd: {x: 0, y: 0}
 --- !u!120 &2523853978683386468
 LineRenderer:
   serializedVersion: 2
