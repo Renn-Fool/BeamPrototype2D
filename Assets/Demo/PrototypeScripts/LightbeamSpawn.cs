@@ -25,7 +25,7 @@ public class LightbeamSpawn : MonoBehaviour
             lightbeamRide.onStopRidingBeam.AddListener(ReturnBeam);
             isListenerSet = true;
         }
-        if (lightbeamRide != null && lightbeamRide.isRiding == false && isListenerSet == true)
+        if (lightbeamRide == null && lightbeamRide.isRiding == false && isListenerSet == true)
         {
             // Register the listener for the event from LightbeamRide
             lightbeamRide.onStopRidingBeam.RemoveListener(ReturnBeam);
@@ -46,14 +46,18 @@ public class LightbeamSpawn : MonoBehaviour
         GameObject beamInstance = Instantiate(beamPrefab, start, Quaternion.identity);
         
         activeBeam = beamInstance.GetComponent<LightbeamController>();
-        activeBeam.FireBeam(start, direction);
+        activeBeam.ExtendBeam(start, direction);
+        activeBeam.gameObject.SetActive(true);
     }
 
     public void ReturnBeam()
     {
         _isBeamSpawned = false;
         Debug.Log("Beam Retracted");
-        Destroy(activeBeam.gameObject);
+        if (activeBeam != null)
+        {
+           Destroy(activeBeam.gameObject);
+        }
     }
     
 }

@@ -7,11 +7,14 @@ using UnityEngine.Events;
 public class LightbeamRide : MonoBehaviour
 {
     private CharacterMovement2D movement;
+    private LightbeamController beamController;
     [SerializeField] public float rideSpeed = 10f;
     [SerializeField] public bool isRiding = false;
     private Vector2 travelDirection;
     private Rigidbody2D rb;
-
+    private Collider2D currentBeam;
+    public LayerMask beamLayer; // Assign the beam layer in the Inspector
+    public float detectionRadius = 0.5f;
     public UnityEvent onStopRidingBeam;
 
     private void Start()
@@ -23,21 +26,44 @@ public class LightbeamRide : MonoBehaviour
             onStopRidingBeam = new UnityEvent();
     }
 
-   
+    private void Update()
+    {
+        if (!isRiding)
+        {
+            CheckForBeam();
+        }
+    }
 
-    
-    public void RideBeam(Vector2 start, Vector2 end)
+    private void CheckForBeam()
+    {
+        Collider2D beam = Physics2D.OverlapCircle(transform.position, detectionRadius, beamLayer);
+
+        if (beam != null && beam != currentBeam) // Ensure we are detecting a new beam
+        {
+            Debug.Log("Player detected beam, starting ride.");
+            currentBeam = beam;
+           RideBeam(beam);
+        }
+    }
+
+    public void RideBeam(Collider2D beam)
     {
         
-        isRiding = true;
-        travelDirection = (end - start).normalized;
-        movement.CanMove = false;
-        
-        StartCoroutine(RideCoroutine(start, end));
+        LightbeamController beamController = beam.GetComponent<LightbeamController>();
+        if (beamController != null)
+        {
+            isRiding = true;
+            Vector2 beamStart = beamController.GetRideStart();// Use the beam's start and end points
+            Vector2 beamEnd = beamController.GetBeamEnd();
+            travelDirection = (beamEnd - beamStart).normalized;
+
+            StartCoroutine(RideCoroutine(beamStart, beamEnd));
+        }
     }
 
     private System.Collections.IEnumerator RideCoroutine(Vector2 start, Vector2 end)
     {
+        movement.CanMove = false;
         float distance = Vector2.Distance(start, end);
         float travelTime = distance / rideSpeed;
         float elapsedTime = 0f;
@@ -70,5 +96,11 @@ public class LightbeamRide : MonoBehaviour
         isRiding = false;
         movement.CanMove = true;
         onStopRidingBeam.Invoke();
+    }
+
+    private void OnDrawGizmosSelected()
+    {
+        Gizmos.color = Color.green;
+        Gizmos.DrawWireSphere(transform.position, detectionRadius);
     }
 }

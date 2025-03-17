@@ -25,24 +25,15 @@ public class LightbeamController : MonoBehaviour
     {
         lineRenderer = GetComponent<LineRenderer>();
         edgeCollider = GetComponent<EdgeCollider2D>();
+        //lineRenderer.positionCount = nodes.Count;
         edgeCollider.isTrigger = true;
-        //SetEdgeCollider(lineRenderer);
+        
     }
 
     private void Update()
     {
         SetEdgeCollider(lineRenderer);
 
-
-        //failsafe for the triggerenter being dumb
-        if (beamRide == null) // Only check if the beam ride hasn't started
-        {
-            Collider2D hit = Physics2D.OverlapPoint(transform.position, LayerMask.GetMask(targetLayerName));
-            if (hit != null)
-            {
-                OnTriggerEnter2D(hit);
-            }
-        }
     }
 
     public void SetEdgeCollider(LineRenderer lineRenderer)
@@ -55,30 +46,28 @@ public class LightbeamController : MonoBehaviour
             edges.Add(new Vector2(lineRendererPoint.x, lineRendererPoint.y));
         }
         edgeCollider.SetPoints(edges);
+
+        // Force Unity to update the physics system
+        edgeCollider.enabled = false;
+        edgeCollider.enabled = true;
     }
 
-    private void OnTriggerEnter2D(Collider2D collision)
+    public void OnTriggerEnter2D(Collider2D collision)
     {
-
+    
         int layer = collision.gameObject.layer;
         playerPositionOnTrigger = collision.transform.position;
-
+    
         if (layer == LayerMask.NameToLayer(targetLayerName))
         {
-
+    
             beamRide = collision.GetComponent<LightbeamRide>();
             beamPlayerRideStart = edgeCollider.ClosestPoint(playerPositionOnTrigger);
-
-            if (beamRide != null)
-            {
-                
-                beamRide.RideBeam(beamPlayerRideStart, beamEnd);
-                Debug.Log("Player entered the beam. Starting ride.");
-            }
+            
         }
     }
 
-    public void FireBeam(Vector2 start, Vector2 direction)
+    public void ExtendBeam(Vector2 start, Vector2 direction)
     {
 
         beamStart = start;
@@ -111,12 +100,17 @@ public class LightbeamController : MonoBehaviour
 
     public Vector2 GetBeamStart()
     {
-        return beamStart;
+         return beamStart;
     }
 
     public Vector2 GetBeamEnd()
     {
-        return beamEnd;
+           return beamEnd;
+    }
+
+    public Vector2 GetRideStart()
+    {
+        return beamPlayerRideStart;
     }
 
     //copy pasted from above setedgecollider
@@ -148,4 +142,4 @@ public class LightbeamController : MonoBehaviour
 //beam spawn position offset forward a little in the direction of the mouse
 //make sure player only starts moving when directly on beam
 //make em reflectable
-//
+//player floats above beam and travels instead of directily on it
