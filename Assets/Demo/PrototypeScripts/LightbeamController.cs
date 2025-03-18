@@ -83,7 +83,7 @@ public class LightbeamController : MonoBehaviour
             else
             {
                 //if nothing is hit go the max distance
-               beamPoints.Add(currentDirection.normalized * maxBeamLength);
+               beamPoints.Add(currentStart + currentDirection.normalized * maxBeamLength);
                Debug.Log("Beam did not hit anything, setting beamEnd to max length.");
 
                break;  
@@ -106,9 +106,20 @@ public class LightbeamController : MonoBehaviour
     }
     public void SetEdgeCollider()
     {
+        //if (beamPoints.Count > 1)
+        //{
+        //    edgeCollider.SetPoints(beamPoints);
+        //}
         if (beamPoints.Count > 1)
         {
-            edgeCollider.SetPoints(beamPoints);
+            List<Vector2> localPoints = new List<Vector2>();
+
+            foreach (Vector2 worldPoint in beamPoints)
+            {
+                localPoints.Add(transform.InverseTransformPoint(worldPoint));
+            }
+
+            edgeCollider.SetPoints(localPoints);
         }
     }
 

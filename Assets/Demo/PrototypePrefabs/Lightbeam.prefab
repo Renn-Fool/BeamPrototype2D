@@ -47,13 +47,14 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   lineRenderer: {fileID: 2523853978683386468}
-  nodes: []
   edgeCollider: {fileID: 5940206894055894271}
+  beamPoints: []
   collisionMask:
     serializedVersion: 2
     m_Bits: 1
   targetLayerName: Character
   maxBeamLength: 500
+  maxReflections: 5
 --- !u!120 &2523853978683386468
 LineRenderer:
   serializedVersion: 2
@@ -196,7 +197,7 @@ EdgeCollider2D:
   m_CompositeOperation: 0
   m_CompositeOrder: 0
   m_Offset: {x: 0, y: 0}
-  m_EdgeRadius: 0.3
+  m_EdgeRadius: 0.2
   m_Points:
   - {x: -0.5, y: 0}
   - {x: 0.5, y: 0}
