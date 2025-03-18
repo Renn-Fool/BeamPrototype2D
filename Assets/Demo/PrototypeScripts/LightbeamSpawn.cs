@@ -34,7 +34,7 @@ public class LightbeamSpawn : MonoBehaviour
     }
     public void SpawnBeam(Vector2 start, Vector2 direction)
     {
-        //start = _beamSpawnTransform.transform.position;
+      
         if (activeBeam != null && _isBeamSpawned == true)
         {
 

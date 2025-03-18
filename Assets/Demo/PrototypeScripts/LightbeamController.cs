@@ -70,7 +70,7 @@ public class LightbeamController : MonoBehaviour
                 IReflective reflectiveObject = hit.collider.GetComponent<IReflective>();
                 if (reflectiveObject != null && reflections < maxReflections - 1)
                 {
-                    Vector2 reflectedDirection = reflectiveObject.ReflectBeam(currentDirection, hit.normal);
+                    currentDirection = reflectiveObject.ReflectBeam(currentDirection, hit.normal);
                     currentStart = hit.point;
                     reflections++;
                     continue;

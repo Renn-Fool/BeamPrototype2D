@@ -2,15 +2,19 @@ using UnityEngine;
 
 public class Antimatter : MonoBehaviour
 {
-    // Start is called once before the first execution of Update after the MonoBehaviour is created
-    void Start()
+    [SerializeField] private string playerTag = "Player";
+
+    private void OnTriggerEnter2D(Collider2D collision)
     {
-        
+        if (collision.CompareTag(playerTag))
+        {
+            DestroyPlayer(collision.gameObject);
+        }
     }
 
-    // Update is called once per frame
-    void Update()
+    private void DestroyPlayer(GameObject player)
     {
-        
+
+        Destroy(player);
     }
 }
