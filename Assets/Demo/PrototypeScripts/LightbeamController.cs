@@ -14,11 +14,9 @@ public class LightbeamController : MonoBehaviour
     [SerializeField] private string targetLayerName = "Character";
     [SerializeField] private float maxBeamLength = 500f;
     [SerializeField] private int maxReflections = 5;
-    private Vector2 beamStart;
     private Vector2 beamEnd;
     private Vector2 beamPlayerRideStart;
     private Vector2 playerPositionOnTrigger;
-    private bool beamActive;
 
 
     private void Start()
@@ -54,12 +52,13 @@ public class LightbeamController : MonoBehaviour
         int reflections = 0;
 
 
-        Debug.DrawLine(start, direction * 100);
-        RaycastHit2D hit = Physics2D.Raycast(currentStart, currentDirection.normalized, maxBeamLength, collisionMask);
+        //Debug.DrawLine(start, direction * 100);
+        //RaycastHit2D hit = Physics2D.Raycast(currentStart, currentDirection.normalized, maxBeamLength, collisionMask);
 
         while (reflections <= maxReflections)
         {
-           
+            Debug.DrawLine(start, direction * 100);
+            RaycastHit2D hit = Physics2D.Raycast(currentStart, currentDirection.normalized, maxBeamLength, collisionMask);
 
             if (hit.collider != null)
             {
@@ -67,27 +66,31 @@ public class LightbeamController : MonoBehaviour
                 beamPoints.Add(hit.point);
                 Debug.Log($"Beam hit object: {hit.collider.name} at {beamEnd}");
 
+
                 IReflective reflectiveObject = hit.collider.GetComponent<IReflective>();
-                if (reflectiveObject != null)
+                if (reflectiveObject != null && reflections < maxReflections - 1)
                 {
-                    Vector2 reflectedDirection = reflectiveObject.ReflectBeam(currentDirection, hit.point);
+                    Vector2 reflectedDirection = reflectiveObject.ReflectBeam(currentDirection, hit.normal);
                     currentStart = hit.point;
                     reflections++;
                     continue;
+
                 }
-                else break;
+
+                break;
 
             }
             else
             {
+                //if nothing is hit go the max distance
                beamPoints.Add(currentDirection.normalized * maxBeamLength);
-                Debug.Log("Beam did not hit anything, setting beamEnd to max length.");
-            }
+               Debug.Log("Beam did not hit anything, setting beamEnd to max length.");
 
-            DrawBeam();
-            beamActive = true;
+               break;  
+            }
         }
-        beamEnd = hit.point;
+
+        DrawBeam();
         
     }
 
@@ -103,17 +106,15 @@ public class LightbeamController : MonoBehaviour
     }
     public void SetEdgeCollider()
     {
-        edgeCollider.SetPoints(beamPoints);
-    }
-
-    public Vector2 GetBeamStart()
-    {
-         return beamStart;
+        if (beamPoints.Count > 1)
+        {
+            edgeCollider.SetPoints(beamPoints);
+        }
     }
 
     public Vector2 GetBeamEnd()
     {
-           return beamEnd;
+        return beamPoints[^1];
     }
 
     public Vector2 GetRideStart()
@@ -121,7 +122,7 @@ public class LightbeamController : MonoBehaviour
         return beamPlayerRideStart;
     }
 
-    //copy pasted from above setedgecollider
+    
     private void OnDrawGizmos()
     {
         if (edgeCollider == null || lineRenderer == null) return;
