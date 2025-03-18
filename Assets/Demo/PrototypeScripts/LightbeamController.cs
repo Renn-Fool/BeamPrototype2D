@@ -6,18 +6,18 @@ using UnityEngine;
 public class LightbeamController : MonoBehaviour
 {
     [SerializeField] private LineRenderer lineRenderer;
-    [SerializeField] private List<Transform> nodes;
     [SerializeField] private EdgeCollider2D edgeCollider;
-    private List<Vector2> colliderPoints = new List<Vector2>();
+    private LightbeamRide beamRide;
+    [SerializeField] private List<Vector2> beamPoints = new List<Vector2>();
+
     [SerializeField] private LayerMask collisionMask;
     [SerializeField] private string targetLayerName = "Character";
     [SerializeField] private float maxBeamLength = 500f;
-
+    [SerializeField] private int maxReflections = 5;
     private Vector2 beamStart;
+    private Vector2 beamEnd;
     private Vector2 beamPlayerRideStart;
     private Vector2 playerPositionOnTrigger;
-    private Vector2 beamEnd;
-    private LightbeamRide beamRide;
     private bool beamActive;
 
 
@@ -25,31 +25,8 @@ public class LightbeamController : MonoBehaviour
     {
         lineRenderer = GetComponent<LineRenderer>();
         edgeCollider = GetComponent<EdgeCollider2D>();
-        //lineRenderer.positionCount = nodes.Count;
         edgeCollider.isTrigger = true;
         
-    }
-
-    private void Update()
-    {
-        SetEdgeCollider(lineRenderer);
-
-    }
-
-    public void SetEdgeCollider(LineRenderer lineRenderer)
-    {
-        List<Vector2> edges = new List<Vector2>();
-
-        for (int point = 0; point < lineRenderer.positionCount; point++)
-        {
-            Vector3 lineRendererPoint = lineRenderer.GetPosition(point);
-            edges.Add(new Vector2(lineRendererPoint.x, lineRendererPoint.y));
-        }
-        edgeCollider.SetPoints(edges);
-
-        // Force Unity to update the physics system
-        edgeCollider.enabled = false;
-        edgeCollider.enabled = true;
     }
 
     public void OnTriggerEnter2D(Collider2D collision)
@@ -69,33 +46,64 @@ public class LightbeamController : MonoBehaviour
 
     public void ExtendBeam(Vector2 start, Vector2 direction)
     {
+        beamPoints.Clear();
+        beamPoints.Add(start);
 
-        beamStart = start;
+        Vector2 currentStart = start;
+        Vector2 currentDirection = direction; //these current var's are here to determine the where in the reflection we are
+        int reflections = 0;
+
+
         Debug.DrawLine(start, direction * 100);
-        RaycastHit2D hit = Physics2D.Raycast(beamStart, direction.normalized, maxBeamLength, collisionMask);
-        Debug.Log($"Fire Direction: {direction}, Magnitude: {direction.magnitude}");
+        RaycastHit2D hit = Physics2D.Raycast(currentStart, currentDirection.normalized, maxBeamLength, collisionMask);
 
-
-        if (hit.collider != null)
+        while (reflections <= maxReflections)
         {
-            beamEnd = hit.point;
-            Debug.Log($"Beam hit object: {hit.collider.name} at {beamEnd}");
-        }
-        else
-        {
-            beamEnd = beamStart + (direction.normalized * maxBeamLength);
-            Debug.Log("Beam did not hit anything, setting beamEnd to max length.");
-        }
+           
 
-        DrawBeam();
-        beamActive = true;
+            if (hit.collider != null)
+            {
+                
+                beamPoints.Add(hit.point);
+                Debug.Log($"Beam hit object: {hit.collider.name} at {beamEnd}");
+
+                IReflective reflectiveObject = hit.collider.GetComponent<IReflective>();
+                if (reflectiveObject != null)
+                {
+                    Vector2 reflectedDirection = reflectiveObject.ReflectBeam(currentDirection, hit.point);
+                    currentStart = hit.point;
+                    reflections++;
+                    continue;
+                }
+                else break;
+
+            }
+            else
+            {
+               beamPoints.Add(currentDirection.normalized * maxBeamLength);
+                Debug.Log("Beam did not hit anything, setting beamEnd to max length.");
+            }
+
+            DrawBeam();
+            beamActive = true;
+        }
+        beamEnd = hit.point;
+        
     }
 
     private void DrawBeam()
     {
-        lineRenderer.positionCount = 2;
-        lineRenderer.SetPosition(0, beamStart);
-        lineRenderer.SetPosition(1, beamEnd);
+        lineRenderer.positionCount = beamPoints.Count;
+        for (int i = 0; i < beamPoints.Count; i++)
+        {
+            lineRenderer.SetPosition(i, beamPoints[i]);
+        }
+
+        SetEdgeCollider();
+    }
+    public void SetEdgeCollider()
+    {
+        edgeCollider.SetPoints(beamPoints);
     }
 
     public Vector2 GetBeamStart()
