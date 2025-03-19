@@ -415,6 +415,7 @@ MonoBehaviour:
   onStopRidingBeam:
     m_PersistentCalls:
       m_Calls: []
+  targetLayerName: Character
 --- !u!114 &4001811317445761059
 MonoBehaviour:
   m_ObjectHideFlags: 0

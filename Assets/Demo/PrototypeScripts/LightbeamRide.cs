@@ -17,6 +17,10 @@ public class LightbeamRide : MonoBehaviour
     public float detectionRadius = 0.5f;
     public UnityEvent onStopRidingBeam;
 
+    private Vector2 beamPlayerRideStart;
+    private Vector2 playerPositionOnTrigger;
+    [SerializeField] private string targetLayerName = "Lightbeam";
+
     private void Start()
     {
         if (movement == null) movement = GetComponent<CharacterMovement2D>();
@@ -26,15 +30,36 @@ public class LightbeamRide : MonoBehaviour
             onStopRidingBeam = new UnityEvent();
     }
 
-    private void Update()
+    //private void Update()
+    //{
+    //    if (!isRiding)
+    //    {
+    //        CheckForBeam();
+    //    }
+    //}
+
+    private void OnTriggerStay2D(Collider2D collision)
     {
-        if (!isRiding)
+        Debug.Log("IN");
+        int layer = collision.gameObject.layer;
+        playerPositionOnTrigger = transform.position;
+
+        if (layer == LayerMask.NameToLayer(targetLayerName))
         {
-            CheckForBeam();
+
+            beamController = collision.GetComponent<LightbeamController>();
+            beamPlayerRideStart = beamController.edgeCollider.ClosestPoint(playerPositionOnTrigger);
+
         }
     }
+    private void OnTriggerExit2D(Collider2D collision)
+    {
+        Debug.Log("OUT");
+        beamController = null;
+        beamPlayerRideStart = Vector2.zero;
+    }
 
-    private void CheckForBeam()
+    public void CheckForBeam()
     {
         Collider2D beam = Physics2D.OverlapCircle(transform.position, detectionRadius, beamLayer);
 
@@ -42,7 +67,7 @@ public class LightbeamRide : MonoBehaviour
         {
             Debug.Log("Player detected beam, starting ride.");
             currentBeam = beam;
-           RideBeam(beam);
+            RideBeam(beam);
         }
     }
 

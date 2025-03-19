@@ -46,4 +46,10 @@ public class PrototypePlayerController : PlayerController
             }
         }
     }
+
+    private void OnRide(InputValue value)
+    {
+        if(lightbeamRide.isRiding == false)
+        lightbeamRide.CheckForBeam();
+    }
 }

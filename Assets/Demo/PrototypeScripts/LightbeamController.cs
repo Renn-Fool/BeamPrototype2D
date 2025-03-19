@@ -6,7 +6,7 @@ using UnityEngine;
 public class LightbeamController : MonoBehaviour
 {
     [SerializeField] private LineRenderer lineRenderer;
-    [SerializeField] private EdgeCollider2D edgeCollider;
+    [SerializeField] public EdgeCollider2D edgeCollider;
     private LightbeamRide beamRide;
     [SerializeField] private List<Vector2> beamPoints = new List<Vector2>();
 
@@ -24,23 +24,23 @@ public class LightbeamController : MonoBehaviour
         lineRenderer = GetComponent<LineRenderer>();
         edgeCollider = GetComponent<EdgeCollider2D>();
         edgeCollider.isTrigger = true;
-        
+          
     }
 
-    public void OnTriggerEnter2D(Collider2D collision)
-    {
-    
-        int layer = collision.gameObject.layer;
-        playerPositionOnTrigger = collision.transform.position;
-    
-        if (layer == LayerMask.NameToLayer(targetLayerName))
-        {
-    
-            beamRide = collision.GetComponent<LightbeamRide>();
-            beamPlayerRideStart = edgeCollider.ClosestPoint(playerPositionOnTrigger);
-            
-        }
-    }
+    //public void OnTriggerEnter2D(Collider2D collision)
+    //{
+    //
+    //    int layer = collision.gameObject.layer;
+    //    playerPositionOnTrigger = collision.transform.position;
+    //
+    //    if (layer == LayerMask.NameToLayer(targetLayerName))
+    //    {
+    //
+    //        beamRide = collision.GetComponent<LightbeamRide>();
+    //        beamPlayerRideStart = edgeCollider.ClosestPoint(playerPositionOnTrigger);
+    //        
+    //    }
+    //}
 
     public void ExtendBeam(Vector2 start, Vector2 direction)
     {

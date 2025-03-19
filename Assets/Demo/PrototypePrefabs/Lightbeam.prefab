@@ -111,7 +111,7 @@ LineRenderer:
       m_Curve:
       - serializedVersion: 3
         time: 0
-        value: 0.52760696
+        value: 0.4095955
         inSlope: -0.016971286
         outSlope: -0.016971286
         tangentMode: 0
@@ -197,7 +197,7 @@ EdgeCollider2D:
   m_CompositeOperation: 0
   m_CompositeOrder: 0
   m_Offset: {x: 0, y: 0}
-  m_EdgeRadius: 0.2
+  m_EdgeRadius: 2
   m_Points:
   - {x: -0.5, y: 0}
   - {x: 0.5, y: 0}
